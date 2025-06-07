@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/providers/SessionProvider";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import DemoButton from "@/components/auth/DemoButton";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -92,6 +93,8 @@ export default function Home() {
             Get Started - It&apos;s Free!
           </Button>
         </div>
+
+        <DemoButton />
       </div>
     </div>
   );

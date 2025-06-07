@@ -5,7 +5,7 @@ import { useAuth } from "@/components/providers/SessionProvider";
 import { Button } from "@/components/ui/Button";
 
 export default function AuthButton() {
-  const { user, loading, signInWithEmail, signOut } = useAuth();
+  const { user, loading, isDemo, signInWithEmail, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -22,9 +22,18 @@ export default function AuthButton() {
   if (user) {
     return (
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-600">Welcome, {user.email}</span>
+        <div className="flex items-center gap-2">
+          {isDemo && (
+            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
+              🎭 Demo
+            </span>
+          )}
+          <span className="text-sm text-gray-600">
+            Welcome, {user.user_metadata?.full_name || user.email}
+          </span>
+        </div>
         <Button onClick={signOut} variant="outline">
-          Sign Out
+          {isDemo ? "Exit Demo" : "Sign Out"}
         </Button>
       </div>
     );
