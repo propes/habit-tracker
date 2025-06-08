@@ -17,7 +17,7 @@ interface AuthContextType {
   isDemo: boolean;
   signIn: () => Promise<void>;
   signInWithEmail: (email: string) => Promise<void>;
-  signInDemo: () => void;
+  signInDemo: () => Promise<void>;
   signOut: () => Promise<void>;
   exitDemo: () => void;
 }
@@ -42,10 +42,34 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [isDemo, setIsDemo] = useState(false);
   const supabase = createClientSupabase();
 
+  // Function to ensure user exists in our database
+  const ensureUserExists = async (supabaseUser: User) => {
+    try {
+      await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: supabaseUser.id,
+          email: supabaseUser.email,
+          name:
+            supabaseUser.user_metadata?.full_name ||
+            supabaseUser.user_metadata?.name ||
+            null,
+        }),
+      });
+    } catch (error) {
+      console.error("Error ensuring user exists:", error);
+    }
+  };
+
   useEffect(() => {
     // Check for demo mode on initial load
     if (isInDemoMode()) {
       const demoUser = createDemoUser() as User;
+      // Ensure demo user exists in database
+      ensureUserExists(demoUser);
       setUser(demoUser);
       setIsDemo(true);
       setLoading(false);
@@ -57,6 +81,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        await ensureUserExists(session.user);
+      }
+
       setUser(session?.user ?? null);
       setLoading(false);
     };
@@ -67,6 +96,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await ensureUserExists(session.user);
+      }
+
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -96,13 +129,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const signInDemo = () => {
+  const signInDemo = async () => {
     if (!isDemoModeAvailable()) {
       console.warn("Demo mode is not available in this environment");
       return;
     }
 
     const demoUser = createDemoUser() as User;
+
+    // Ensure demo user exists in database
+    await ensureUserExists(demoUser);
+
     setUser(demoUser);
     setIsDemo(true);
     enableDemoMode();

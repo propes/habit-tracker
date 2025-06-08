@@ -12,6 +12,14 @@ export default function DemoButton() {
     return null;
   }
 
+  const handleDemoSignIn = async () => {
+    try {
+      await signInDemo();
+    } catch (error) {
+      console.error("Error signing in with demo mode:", error);
+    }
+  };
+
   return (
     <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
       <div className="flex items-center gap-2 mb-2">
@@ -23,7 +31,7 @@ export default function DemoButton() {
         testing and development.
       </p>
       <Button
-        onClick={signInDemo}
+        onClick={handleDemoSignIn}
         variant="outline"
         className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200"
       >
