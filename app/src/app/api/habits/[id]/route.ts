@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 // GET /api/habits/[id] - Get a specific habit
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
@@ -52,10 +52,10 @@ export async function GET(
 // PUT /api/habits/[id] - Update a habit
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { userId, name, description, categoryId, color, isActive } = body;
 
@@ -119,10 +119,10 @@ export async function PUT(
 // DELETE /api/habits/[id] - Delete a habit
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 

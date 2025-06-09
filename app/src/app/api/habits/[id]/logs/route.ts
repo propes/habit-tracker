@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 // GET /api/habits/[id]/logs - Get logs for a specific habit
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
     const limit = searchParams.get("limit");
@@ -70,10 +70,10 @@ export async function GET(
 // POST /api/habits/[id]/logs - Create a new habit log (check-in)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { userId, completedDate, notes } = body;
 
@@ -138,10 +138,10 @@ export async function POST(
 // DELETE /api/habits/[id]/logs - Delete a habit log (undo check-in)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
     const completedDate = searchParams.get("completedDate");
