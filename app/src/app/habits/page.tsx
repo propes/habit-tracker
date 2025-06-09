@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/SessionProvider";
 import { HabitList } from "@/components/habits/HabitList";
 import { HabitForm } from "@/components/habits/HabitForm";
+import { HabitFilters } from "@/components/habits/HabitFilters";
 import { Button } from "@/components/ui/Button";
 
 interface Habit {
@@ -24,10 +25,19 @@ interface Habit {
   totalLogs: number;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
+
 export default function Habits() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [filteredHabits, setFilteredHabits] = useState<Habit[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,8 +47,13 @@ export default function Habits() {
   useEffect(() => {
     if (user) {
       fetchHabits();
+      fetchCategories();
     }
   }, [user]);
+
+  useEffect(() => {
+    setFilteredHabits(habits);
+  }, [habits]);
 
   if (loading) {
     return (
@@ -68,6 +83,18 @@ export default function Habits() {
       setError("Failed to fetch habits");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/categories");
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -200,6 +227,70 @@ export default function Habits() {
     router.push("/habits/new");
   };
 
+  const handleFilterChange = (filters: {
+    search: string;
+    category: string;
+    completionRate: string;
+    streak: string;
+  }) => {
+    let filtered = [...habits];
+
+    // Search filter
+    if (filters.search) {
+      filtered = filtered.filter(
+        (habit) =>
+          habit.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+          (habit.description &&
+            habit.description
+              .toLowerCase()
+              .includes(filters.search.toLowerCase()))
+      );
+    }
+
+    // Category filter
+    if (filters.category) {
+      filtered = filtered.filter(
+        (habit) => habit.category.id === filters.category
+      );
+    }
+
+    // Completion rate filter
+    if (filters.completionRate) {
+      filtered = filtered.filter((habit) => {
+        switch (filters.completionRate) {
+          case "excellent":
+            return habit.completionRate >= 80;
+          case "good":
+            return habit.completionRate >= 60 && habit.completionRate < 80;
+          case "needs-work":
+            return habit.completionRate < 60;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Streak filter
+    if (filters.streak) {
+      filtered = filtered.filter((habit) => {
+        switch (filters.streak) {
+          case "hot":
+            return habit.currentStreak >= 7;
+          case "building":
+            return habit.currentStreak >= 3 && habit.currentStreak < 7;
+          case "starting":
+            return habit.currentStreak >= 1 && habit.currentStreak < 3;
+          case "broken":
+            return habit.currentStreak === 0;
+          default:
+            return true;
+        }
+      });
+    }
+
+    setFilteredHabits(filtered);
+  };
+
   if (showForm) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -263,13 +354,22 @@ export default function Habits() {
           </div>
         )}
 
+        {!isLoading && habits.length > 0 && (
+          <HabitFilters
+            categories={categories}
+            onFilterChange={handleFilterChange}
+            totalHabits={habits.length}
+            filteredCount={filteredHabits.length}
+          />
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-lg">Loading habits...</div>
           </div>
         ) : (
           <HabitList
-            habits={habits}
+            habits={filteredHabits}
             onCheckIn={handleCheckIn}
             onUndoCheckIn={handleUndoCheckIn}
             onEdit={handleEdit}
