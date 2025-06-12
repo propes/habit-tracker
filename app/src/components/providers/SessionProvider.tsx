@@ -15,7 +15,6 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isDemo: boolean;
-  signIn: () => Promise<void>;
   signInWithEmail: (email: string) => Promise<void>;
   signInDemo: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -107,15 +106,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  const signIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-  };
-
   const signInWithEmail = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -163,7 +153,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     user,
     loading,
     isDemo,
-    signIn,
     signInWithEmail,
     signInDemo,
     signOut,

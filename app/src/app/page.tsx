@@ -81,19 +81,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-blue-50 p-8 rounded-lg">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Ready to get started?
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Sign in with Google to begin tracking your habits and building a
-            better you.
-          </p>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3">
-            Get Started - It&apos;s Free!
-          </Button>
-        </div>
-
         <DemoButton />
       </div>
     </div>
