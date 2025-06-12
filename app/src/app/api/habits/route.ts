@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { logger, getRequestContext, getRequestBody } from "@/lib/logger";
 
 const prisma = new PrismaClient();
 
 // GET /api/habits - Get all habits for the authenticated user
 export async function GET(request: NextRequest) {
+  const context = getRequestContext(request);
+  logger.apiRequest(request.method, request.url, context);
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
     if (!userId) {
+      logger.apiResponse(request.method, request.url, 400, {
+        ...context,
+        error: "User ID is required",
+      });
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
@@ -92,9 +100,21 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    logger.apiResponse(request.method, request.url, 200, {
+      ...context,
+      userId,
+      habitsCount: habitsWithStats.length,
+    });
     return NextResponse.json(habitsWithStats);
   } catch (error) {
-    console.error("Error fetching habits:", error);
+    logger.error("Error fetching habits", error, {
+      ...context,
+      userId: new URL(request.url).searchParams.get("userId") || undefined,
+    });
+    logger.apiResponse(request.method, request.url, 500, {
+      ...context,
+      error: "Failed to fetch habits",
+    });
     return NextResponse.json(
       { error: "Failed to fetch habits" },
       { status: 500 }
@@ -104,11 +124,25 @@ export async function GET(request: NextRequest) {
 
 // POST /api/habits - Create a new habit
 export async function POST(request: NextRequest) {
+  const context = getRequestContext(request);
+  logger.apiRequest(request.method, request.url, context);
+
   try {
-    const body = await request.json();
-    const { userId, name, description, categoryId, color } = body;
+    const body = await getRequestBody(request);
+    const { userId, name, description, categoryId, color } = body as {
+      userId: string;
+      name: string;
+      description?: string;
+      categoryId: string;
+      color?: string;
+    };
 
     if (!userId || !name || !categoryId) {
+      logger.apiResponse(request.method, request.url, 400, {
+        ...context,
+        body,
+        error: "User ID, name, and category are required",
+      });
       return NextResponse.json(
         { error: "User ID, name, and category are required" },
         { status: 400 }
@@ -121,6 +155,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
+      logger.apiResponse(request.method, request.url, 404, {
+        ...context,
+        body,
+        userId,
+        error: "User not found",
+      });
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -130,6 +170,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!category) {
+      logger.apiResponse(request.method, request.url, 404, {
+        ...context,
+        body,
+        userId,
+        categoryId,
+        error: "Category not found",
+      });
       return NextResponse.json(
         { error: "Category not found" },
         { status: 404 }
@@ -149,9 +196,22 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    logger.apiResponse(request.method, request.url, 201, {
+      ...context,
+      userId,
+      habitId: habit.id,
+      habitName: habit.name,
+    });
     return NextResponse.json(habit, { status: 201 });
   } catch (error) {
-    console.error("Error creating habit:", error);
+    logger.error("Error creating habit", error, {
+      ...context,
+      body: await getRequestBody(request),
+    });
+    logger.apiResponse(request.method, request.url, 500, {
+      ...context,
+      error: "Failed to create habit",
+    });
     return NextResponse.json(
       { error: "Failed to create habit" },
       { status: 500 }
