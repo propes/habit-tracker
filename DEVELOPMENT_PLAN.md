@@ -158,6 +158,109 @@ src/
 - Professional authentication flow
 - Account management features
 
+### Phase 6: Row Level Security Implementation
+**Goal**: Add database-level security while maintaining Prisma ORM benefits
+
+**Overview**: Implement PostgreSQL Row Level Security (RLS) policies while keeping Prisma for complex queries and type safety. This provides database-level security that works regardless of how the database is accessed.
+
+**Implementation Strategy**: Hybrid RLS with Prisma
+- Keep existing Prisma setup for complex queries
+- Add Supabase user context to database connections
+- Implement RLS policies at the PostgreSQL level
+- Create custom Prisma client wrapper for authenticated operations
+
+**Tasks**:
+
+#### Step 1: Database RLS Policies Setup (1-2 hours)
+1. **Enable RLS on all user-related tables**:
+   ```sql
+   ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE "Habit" ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE "HabitLog" ENABLE ROW LEVEL SECURITY;
+   ```
+
+2. **Create comprehensive RLS policies**:
+   ```sql
+   -- Users can only access their own profile
+   CREATE POLICY "user_own_profile" ON "User" 
+   FOR ALL USING (auth.uid()::text = id);
+
+   -- Users can only manage their own habits
+   CREATE POLICY "user_own_habits" ON "Habit" 
+   FOR ALL USING (auth.uid()::text = "userId");
+
+   -- Users can only access logs for their habits
+   CREATE POLICY "user_own_habit_logs" ON "HabitLog" 
+   FOR ALL USING (
+     EXISTS (
+       SELECT 1 FROM "Habit" 
+       WHERE "Habit".id = "HabitLog"."habitId" 
+       AND "Habit"."userId" = auth.uid()::text
+     )
+   );
+
+   -- Categories are readable by all authenticated users
+   CREATE POLICY "categories_read_all" ON "Category" 
+   FOR SELECT USING (auth.role() = 'authenticated');
+   ```
+
+#### Step 2: Custom Prisma Client with User Context (2-3 hours)
+1. **Create authenticated Prisma client wrapper** (`lib/prisma-rls.ts`)
+2. **Create helper function for authenticated operations** (`lib/auth-prisma.ts`)
+3. **Abstract user authentication and context setting**
+
+#### Step 3: Update API Routes for RLS (3-4 hours)
+1. **Modify existing API routes to use authenticated Prisma client**
+2. **Remove manual userId filtering** (RLS handles this automatically)
+3. **Update error handling for unauthorized access**
+4. **Ensure all routes use the new authenticated client**
+
+#### Step 4: Frontend Authentication Integration (2-3 hours)
+1. **Update API calls to include auth headers**
+2. **Create authenticated fetch wrapper**
+3. **Update React Query hooks to use authenticated requests**
+4. **Handle authentication errors gracefully**
+
+#### Step 5: Testing & Validation (2-3 hours)
+1. **Create RLS test suite**:
+   - Test that users can only access their own data
+   - Test that unauthenticated requests are blocked
+   - Test that malicious requests can't bypass RLS
+   - Verify all existing functionality still works
+2. **Performance testing**: Ensure RLS policies don't impact performance
+3. **Security audit**: Review policies for potential bypasses
+
+#### Step 6: Migration Strategy (1-2 hours)
+1. **Gradual rollout approach**: Deploy in permissive mode first
+2. **Rollback plan**: Document how to disable RLS if issues arise
+3. **Database backup**: Before policy deployment
+
+**Benefits**:
+- Database-level security (protection even if application code has bugs)
+- Maintains Prisma benefits (type safety and complex queries)
+- Automatic filtering (no need to manually add userId filters)
+- Future-proof (works with any database access method)
+- Compliance ready (meets security requirements for data isolation)
+
+**Potential Challenges & Solutions**:
+- **Connection Complexity**: Abstract behind helper functions
+- **Performance Impact**: Optimize policies with proper indexes
+- **Development Complexity**: Comprehensive documentation and examples
+
+**Success Metrics**:
+- [ ] All user data properly isolated by RLS policies
+- [ ] No performance degradation > 10%
+- [ ] All existing functionality works unchanged
+- [ ] Security audit passes with no critical issues
+- [ ] Development team comfortable with new patterns
+
+**Deliverables**:
+- Database-level security with RLS policies
+- Custom authenticated Prisma client wrapper
+- Updated API routes with automatic user context
+- Comprehensive test suite for security validation
+- Documentation for RLS implementation patterns
+
 ## Key Implementation Details
 
 ### Authentication Flow (Magic Links)
