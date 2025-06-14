@@ -1,0 +1,88 @@
+# Cline Rules - Prevent sensitive files from being sent to LLM
+
+# Environment files containing secrets
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.template
+
+# Private keys and certificates
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.crt
+**/*.cer
+**/*.der
+
+# Configuration files that may contain secrets
+**/config/secrets.yml
+**/config/secrets.yaml
+**/config/database.yml
+**/config/database.yaml
+**/.secrets
+**/secrets.json
+**/credentials.json
+**/service-account*.json
+
+# Database files
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# Log files (may contain sensitive information)
+**/*.log
+**/logs/
+**/log/
+
+# Backup files
+**/*.bak
+**/*.backup
+**/*.old
+
+# IDE and editor files with potentially sensitive data
+**/.vscode/settings.json
+**/.idea/
+**/nbproject/private/
+
+# OS generated files
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+
+# Large directories that don't need to be processed
+**/node_modules/
+**/vendor/
+**/.git/
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/coverage/
+
+# Docker secrets
+**/docker-compose.override.yml
+**/docker-compose.prod.yml
+**/.dockerignore
+
+# Cloud provider credentials
+**/.aws/
+**/.gcp/
+**/.azure/
+
+# SSH keys
+**/.ssh/
+**/id_rsa
+**/id_ed25519
+**/known_hosts
+
+# Package manager files with potential tokens
+**/.npmrc
+**/.yarnrc
+**/.pip/pip.conf
+
+# Temporary files
+**/tmp/
+**/temp/
+**/*.tmp
+**/*.temp
