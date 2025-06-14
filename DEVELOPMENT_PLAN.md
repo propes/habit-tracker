@@ -124,22 +124,19 @@ src/
 - Historical data view
 
 ### Phase 4: Enhancements (Day 6)
-**Goal**: Add reminders and polish the application
+**Goal**: Polish the application and improve user experience
 
 **Tasks**:
-1. Implement reminder system:
-   - Web Push API setup
-   - Vercel cron job for notifications
-   - User settings for reminder time
-2. Mobile responsiveness improvements
-3. UI/UX polish and animations
-4. Error handling and loading states
-5. Testing and bug fixes
+1. Mobile responsiveness improvements
+2. UI/UX polish and animations
+3. Error handling and loading states
+4. Testing and bug fixes
+5. Performance optimizations
 
 **Deliverables**:
-- Working reminder system
 - Fully responsive design
 - Polished user experience
+- Robust error handling
 - Production-ready application
 
 ### Phase 5: Enhanced Authentication (Optional)
@@ -260,6 +257,116 @@ src/
 - Updated API routes with automatic user context
 - Comprehensive test suite for security validation
 - Documentation for RLS implementation patterns
+
+### Phase 7: Reminder System (Day 7)
+**Goal**: Implement comprehensive notification and reminder system
+
+**Overview**: Add a robust reminder system that helps users stay consistent with their habits through timely notifications and customizable reminder settings.
+
+**Tasks**:
+
+#### Step 1: Web Push API Setup (2-3 hours)
+1. **Configure service worker for push notifications**:
+   - Create service worker file for handling push events
+   - Register service worker in the application
+   - Handle notification click events and routing
+2. **Implement push subscription management**:
+   - Create API endpoints for subscription CRUD operations
+   - Store push subscriptions in database with user association
+   - Handle subscription updates and cleanup
+
+#### Step 2: Notification Settings & User Preferences (2-3 hours)
+1. **Create user notification preferences schema**:
+   - Add notification settings to User model
+   - Include reminder time, frequency, and enabled status
+   - Support per-habit notification customization
+2. **Build notification settings UI**:
+   - Settings page for notification preferences
+   - Time picker for daily reminder time
+   - Toggle switches for different notification types
+   - Test notification functionality
+
+#### Step 3: Vercel Cron Job Implementation (3-4 hours)
+1. **Create cron API endpoint** (`/api/cron/reminders.ts`):
+   - Scheduled function to run every hour
+   - Query users with matching reminder times
+   - Generate personalized reminder messages
+   - Send push notifications to subscribed devices
+2. **Implement notification logic**:
+   - Check user's incomplete habits for the day
+   - Create contextual reminder messages
+   - Handle timezone considerations
+   - Log notification delivery status
+
+#### Step 4: Advanced Notification Features (2-3 hours)
+1. **Smart notification timing**:
+   - Avoid sending notifications for already completed habits
+   - Implement streak-based encouragement messages
+   - Add motivational quotes and progress highlights
+2. **Notification templates and personalization**:
+   - Dynamic message generation based on habit progress
+   - Celebration notifications for milestones
+   - Weekly/monthly progress summaries
+
+#### Step 5: Testing & Optimization (1-2 hours)
+1. **Comprehensive testing**:
+   - Test notification delivery across different browsers
+   - Verify cron job execution and timing
+   - Test notification permission handling
+2. **Performance optimization**:
+   - Optimize database queries for cron jobs
+   - Implement efficient notification batching
+   - Add error handling and retry logic
+
+**Technical Implementation Details**:
+
+```typescript
+// Database Schema Extensions
+model User {
+  // ... existing fields
+  notificationSettings Json? // Stores notification preferences
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id String @id @default(cuid())
+  userId String
+  endpoint String
+  keys Json // p256dh and auth keys
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// Cron Job Structure
+export default async function handler(req: Request) {
+  // 1. Get current hour in different timezones
+  // 2. Query users with matching reminder times
+  // 3. For each user, check incomplete habits
+  // 4. Generate and send personalized notifications
+  // 5. Log delivery status and handle errors
+}
+```
+
+**Benefits**:
+- Increased user engagement and habit consistency
+- Personalized reminder experience
+- Flexible notification scheduling
+- Cross-platform push notification support
+- Analytics on notification effectiveness
+
+**Success Metrics**:
+- [ ] Push notifications working across major browsers
+- [ ] Cron job executing reliably every hour
+- [ ] User notification preferences properly stored and respected
+- [ ] Notification delivery rate > 95%
+- [ ] User engagement increase measurable after implementation
+
+**Deliverables**:
+- Working push notification system
+- Customizable user notification preferences
+- Automated daily reminder system via cron jobs
+- Smart notification logic based on habit completion
+- Comprehensive notification analytics and logging
 
 ## Key Implementation Details
 
