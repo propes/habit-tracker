@@ -130,9 +130,11 @@ export default function Dashboard() {
       : 0;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-4 sm:py-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
+          Dashboard
+        </h1>
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
@@ -146,8 +148,8 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Total Habits
             </h3>
@@ -157,7 +159,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Completed Today
             </h3>
@@ -173,7 +175,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Average Streak
             </h3>
@@ -183,7 +185,7 @@ export default function Dashboard() {
             <p className="text-sm text-gray-500 mt-1">Days in a row</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Weekly Rate
             </h3>
@@ -194,15 +196,16 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
+        <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               Today&apos;s Habits
             </h2>
             <Button
               onClick={() => router.push("/habits")}
               variant="outline"
               size="sm"
+              className="self-start sm:self-auto"
             >
               View All Habits
             </Button>
@@ -226,37 +229,44 @@ export default function Dashboard() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {habits.map((habit) => (
                 <div
                   key={habit.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-0">
                     <div
-                      className="w-4 h-4 rounded-full"
+                      className="w-4 h-4 rounded-full flex-shrink-0"
                       style={{ backgroundColor: habit.color }}
                     />
-                    <div>
-                      <h3 className="font-medium text-gray-900">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-gray-900 truncate">
                         {habit.name}
                       </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>
-                          {habit.category.icon} {habit.category.name}
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mt-1">
+                        <span className="flex items-center gap-1">
+                          <span>{habit.category.icon}</span>
+                          <span className="hidden sm:inline">
+                            {habit.category.name}
+                          </span>
                         </span>
-                        <span>🔥 {habit.currentStreak} day streak</span>
-                        <span>📊 {habit.completionRate}% this week</span>
+                        <span>🔥 {habit.currentStreak}</span>
+                        <span className="hidden sm:inline">
+                          📊 {habit.completionRate}%
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <CheckInButton
-                    habitId={habit.id}
-                    isCompleted={habit.completedToday}
-                    onCheckIn={handleCheckIn}
-                    onUndoCheckIn={handleUndoCheckIn}
-                    size="sm"
-                  />
+                  <div className="flex justify-end sm:justify-start">
+                    <CheckInButton
+                      habitId={habit.id}
+                      isCompleted={habit.completedToday}
+                      onCheckIn={handleCheckIn}
+                      onUndoCheckIn={handleUndoCheckIn}
+                      size="sm"
+                    />
+                  </div>
                 </div>
               ))}
             </div>

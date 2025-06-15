@@ -293,13 +293,13 @@ export default function Habits() {
 
   if (showForm) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {editingHabit ? "Edit Habit" : "Create New Habit"}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               {editingHabit
                 ? "Update your habit details."
                 : "Start building a new positive routine in your life."}
@@ -312,7 +312,7 @@ export default function Habits() {
             </div>
           )}
 
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
             <HabitForm
               onSubmit={handleFormSubmit}
               onCancel={handleFormCancel}
@@ -335,11 +335,15 @@ export default function Habits() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-4 sm:py-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Habits</h1>
-          <Button onClick={handleNewHabit}>Add New Habit</Button>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            My Habits
+          </h1>
+          <Button onClick={handleNewHabit} className="self-start sm:self-auto">
+            Add New Habit
+          </Button>
         </div>
 
         {error && (

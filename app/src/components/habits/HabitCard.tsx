@@ -48,18 +48,20 @@ export function HabitCard({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
+    <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className="flex items-center space-x-3 min-w-0 flex-1">
           <div
-            className="w-4 h-4 rounded-full"
+            className="w-4 h-4 rounded-full flex-shrink-0"
             style={{ backgroundColor: habit.color }}
           />
-          <div>
-            <h3 className="font-semibold text-gray-900">{habit.name}</h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-gray-900 truncate">
+              {habit.name}
+            </h3>
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <span>{habit.category.icon}</span>
-              <span>{habit.category.name}</span>
+              <span className="truncate">{habit.category.name}</span>
             </div>
           </div>
         </div>
@@ -110,21 +112,21 @@ export function HabitCard({
         <p className="text-sm text-gray-600 mb-4">{habit.description}</p>
       )}
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-4">
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-xl sm:text-2xl font-bold text-blue-600">
             {habit.currentStreak}
           </div>
           <div className="text-xs text-gray-500">Day Streak</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-xl sm:text-2xl font-bold text-green-600">
             {habit.completionRate}%
           </div>
           <div className="text-xs text-gray-500">This Week</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-purple-600">
+          <div className="text-xl sm:text-2xl font-bold text-purple-600">
             {habit.totalLogs}
           </div>
           <div className="text-xs text-gray-500">Total Days</div>
@@ -155,7 +157,10 @@ export function HabitCard({
                 clipRule="evenodd"
               />
             </svg>
-            Completed Today - Click to Undo
+            <span className="hidden sm:inline">
+              Completed Today - Click to Undo
+            </span>
+            <span className="sm:hidden">Completed ✓</span>
           </>
         ) : (
           <>
@@ -172,7 +177,8 @@ export function HabitCard({
                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
               />
             </svg>
-            Mark as Done
+            <span className="hidden sm:inline">Mark as Done</span>
+            <span className="sm:hidden">Check In</span>
           </>
         )}
       </Button>

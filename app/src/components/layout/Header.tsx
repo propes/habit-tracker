@@ -1,11 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import AuthButton from "@/components/auth/AuthButton";
+import MobileNav from "@/components/layout/MobileNav";
 import { useAuth } from "@/components/providers/SessionProvider";
 
 export default function Header() {
   const { user, loading, isDemo } = useAuth();
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className="border-b bg-white shadow-sm">
@@ -24,28 +37,63 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
+            {/* Mobile menu button */}
+            {user && !loading && (
+              <button
+                onClick={toggleMobileMenu}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Open menu"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            )}
+
             <Link href="/" className="text-2xl font-bold text-gray-900">
               HabitTracker
             </Link>
 
-            {/* Only show navigation when user is authenticated */}
+            {/* Desktop navigation - only show when user is authenticated */}
             {user && !loading && (
               <nav className="hidden md:flex space-x-6">
                 <Link
                   href="/dashboard"
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  className={`transition-colors ${
+                    pathname === "/dashboard"
+                      ? "text-blue-600 font-medium"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/habits"
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  className={`transition-colors ${
+                    pathname === "/habits"
+                      ? "text-blue-600 font-medium"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
                 >
                   Habits
                 </Link>
                 <Link
                   href="/analytics"
-                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                  className={`transition-colors ${
+                    pathname === "/analytics"
+                      ? "text-blue-600 font-medium"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
                 >
                   Analytics
                 </Link>
@@ -64,6 +112,9 @@ export default function Header() {
           <AuthButton />
         </div>
       </div>
+
+      {/* Mobile Navigation */}
+      <MobileNav isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
     </header>
   );
 }

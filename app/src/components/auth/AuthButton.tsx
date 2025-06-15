@@ -22,7 +22,8 @@ export default function AuthButton() {
   if (user) {
     return (
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
+        {/* Hide welcome message and sign out button on mobile - they're in the hamburger menu */}
+        <div className="hidden md:flex items-center gap-2">
           {isDemo && (
             <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
               🎭 Demo
@@ -32,7 +33,7 @@ export default function AuthButton() {
             Welcome, {user.user_metadata?.full_name || user.email}
           </span>
         </div>
-        <Button onClick={signOut} variant="outline">
+        <Button onClick={signOut} variant="outline" className="hidden md:flex">
           {isDemo ? "Exit Demo" : "Sign Out"}
         </Button>
       </div>
