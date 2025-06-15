@@ -30,7 +30,8 @@ export function CheckInButton({
   return (
     <Button
       onClick={handleClick}
-      disabled={isLoading}
+      loading={isLoading}
+      loadingText={isCompleted ? "Undoing..." : "Checking in..."}
       size={size}
       className={`${
         isCompleted
@@ -38,9 +39,7 @@ export function CheckInButton({
           : "bg-blue-600 hover:bg-blue-700 text-white"
       }`}
     >
-      {isLoading ? (
-        "Loading..."
-      ) : isCompleted ? (
+      {isCompleted ? (
         <>
           <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path

@@ -13,7 +13,7 @@ export default function AuthButton() {
 
   if (loading) {
     return (
-      <Button variant="outline" disabled>
+      <Button variant="outline" loading={true} loadingText="Loading...">
         Loading...
       </Button>
     );
@@ -74,10 +74,12 @@ export default function AuthButton() {
           />
           <Button
             type="submit"
-            disabled={isSigningIn || !email.trim()}
+            loading={isSigningIn}
+            loadingText="Sending..."
+            disabled={!email.trim()}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {isSigningIn ? "Sending..." : "Send Link"}
+            Send Link
           </Button>
         </form>
         {message && (

@@ -28,9 +28,7 @@ export default function Home() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/dashboard">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Go to Dashboard
-              </Button>
+              <Button>Go to Dashboard</Button>
             </Link>
             <Link href="/habits">
               <Button variant="outline">Manage Habits</Button>
